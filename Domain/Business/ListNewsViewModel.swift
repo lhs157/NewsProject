@@ -12,13 +12,17 @@ import RealmSwift
 import RxRealm
 
 public class ListNewsViewModel {
+    // MARK: - Dependencies
     public var service: NewsServiceType
-    private var disposeBag = DisposeBag()
     
+    //MARK: - outputs
     public var listNews:  Observable<(AnyRealmCollection<ArticlesRealm>, RealmChangeset?)>!
     public var errorsTracker = PublishSubject<DomainError>()
     public var loadingActivity = PublishSubject<Bool>()
     
+    //MARK: - private
+    private var disposeBag = DisposeBag()
+
     public init(service: NewsServiceType) {
         self.service = service
         guard let realm = try? Realm() else {

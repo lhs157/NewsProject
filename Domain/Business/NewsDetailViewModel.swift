@@ -11,13 +11,15 @@ import RxCocoa
 
 public class NewsDetailViewModel {
     private var disposeBag = DisposeBag()
+    
+    //MARK: - outputs
     public var selectedNews: ArticlesRealm!
     public var loadingActivity = PublishSubject<Bool>()
     public var hasCache = PublishSubject<Bool>()
     public var archivedURL: URL!
     public var isHasCache = false
-    
     public var webURL = PublishSubject<String>()
+    
     public init (selectedNews: ArticlesRealm?) {
         self.selectedNews = selectedNews
         archivedURL = URL(string: "https://google.com.vn")
