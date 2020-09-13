@@ -48,6 +48,7 @@ target 'ProjectNews' do
   pod 'SnapKit'
   pod 'CRRefresh'
   pod 'RxRealmDataSources'
+  pod 'Fuzi'
   # Pods for ProjectNews
 
   target 'ProjectNewsTests' do

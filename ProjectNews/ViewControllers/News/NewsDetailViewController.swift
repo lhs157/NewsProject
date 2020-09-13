@@ -23,12 +23,17 @@ class NewsDetailViewController: BaseViewController {
     var viewModel: NewsDetailViewModel!
     var backAction = PublishRelay<Void>()
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureWebView()
         setupView()
         addObserver()
-        viewModel.loadWebview()
+        if Connectivity.isConnectedToInternet() {
+            viewModel.loadWebview()
+        } else { // Check if have cache or not
+            viewModel.checkHasCache()
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -57,6 +62,7 @@ extension NewsDetailViewController {
     func addObserver() {
         backButton.rx.tap.bind(to: backAction).disposed(by: disposeBag)
         viewModel.webURL.bind(to: loadWebURL).disposed(by: disposeBag)
+        viewModel.hasCache.bind(to: loadCached).disposed(by: disposeBag)
     }
     
     private var loadWebURL: Binder<String> {
@@ -64,6 +70,16 @@ extension NewsDetailViewController {
             if let url = URL(string: webURL) {
                 let urlRequest = URLRequest(url: url)
                 target.webView.load(urlRequest)
+            }
+        }
+    }
+    
+    private var loadCached: Binder<Bool> {
+        return Binder(self) { (target, shouldLoadCache) in
+            if shouldLoadCache {
+                target.loadCachedWebview(archivedURL: target.viewModel.archivedURL)
+            } else {
+                AlertView.shared.presentSimpleAlert(title: "Error", message: "Không có kết nối mạng!")
             }
         }
     }
@@ -106,6 +122,9 @@ extension NewsDetailViewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         LoadingIndicator.shared.hide()
+        if !viewModel.isHasCache {
+            exportWebview(fetchURL: viewModel.archivedURL)
+        }
     }
     
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
@@ -118,3 +137,29 @@ extension NewsDetailViewController: WKNavigationDelegate {
     }
 }
 
+// MARK: - Webview Archive
+extension NewsDetailViewController {
+    private func exportWebview(fetchURL: URL) {
+        guard let url = webView.url else {
+            return
+        }
+        
+        webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { cookies in
+            WebArchiver.archive(url: url, cookies: cookies) { result in
+                if let data = result.plistData {
+                    do {
+                        try data.write(to: fetchURL)
+                    } catch {
+                        print("fetch URL invalid")
+                    }
+                } else if let firstError = result.errors.first {
+                    print(firstError.localizedDescription)
+                }
+            }
+        }
+    }
+    
+    private func loadCachedWebview(archivedURL: URL) {
+        webView.loadFileURL(archivedURL, allowingReadAccessTo: archivedURL)
+    }
+}
