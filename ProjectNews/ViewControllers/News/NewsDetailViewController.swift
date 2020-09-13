@@ -22,7 +22,7 @@ class NewsDetailViewController: BaseViewController {
     var configuration = WKWebViewConfiguration()
     var viewModel: NewsDetailViewModel!
     var backAction = PublishRelay<Void>()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureWebView()
@@ -42,7 +42,7 @@ class NewsDetailViewController: BaseViewController {
             self?.viewModel.loadWebview()
         }
     }
-
+    
     public static func instantiate(viewModel: NewsDetailViewModel) -> NewsDetailViewController {
         let vc = UIViewController().instantiateViewController(fromStoryboard: .home, ofType: NewsDetailViewController.self)
         vc.viewModel = viewModel

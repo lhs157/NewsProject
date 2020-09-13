@@ -31,13 +31,13 @@ class ListNewsCoordinator: BaseCoordinator {
             handleStore(coordinator: self)
     }
     
-    private var showNewsDetailBinder: Binder<Articles> {
+    private var showNewsDetailBinder: Binder<ArticlesRealm> {
         return Binder(self) { (target, article) in
             target.showNewsDetailScreen(article)
         }
     }
     
-    private func showNewsDetailScreen(_ article: Articles) {
+    private func showNewsDetailScreen(_ article: ArticlesRealm) {
         let coordinator = NewsDetailViewCoordinator(navigationController: navigationController, selectedNews: article)
         coordinator.start()
     }

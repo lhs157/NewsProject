@@ -11,10 +11,10 @@ import RxCocoa
 
 public class NewsDetailViewModel {
     private var disposeBag = DisposeBag()
-    public var selectedNews: Articles!
+    public var selectedNews: ArticlesRealm!
     public var loadingActivity = PublishSubject<Bool>()
     public var webURL = PublishSubject<String>()
-    public init (selectedNews: Articles?) {
+    public init (selectedNews: ArticlesRealm?) {
         self.selectedNews = selectedNews
     }
     

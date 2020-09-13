@@ -24,10 +24,10 @@ class NewsCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
-    func configCell(_ news: Articles) {
+    func configCell(_ news: ArticlesRealm) {
         imgView.kf.setImage(with: URL(string: news.urlToImage ?? ""))
         headlineLabel.text = news.title
-        descriptionLabel.text = news.description
+        descriptionLabel.text = news.desc
         timeStampLabel.text = news.publishedAt
     }
     

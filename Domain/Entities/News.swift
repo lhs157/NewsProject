@@ -20,32 +20,41 @@ public struct News {
     }
 }
 
-public struct Articles {
-    public let source: Source
-    public let author: String?
-    public let title: String
-    public let description: String?
-    public let url: String
-    public let urlToImage: String?
-    public let publishedAt: String
-    public let content: String?
+public class Articles {
+    @objc dynamic public var author: String?
+    @objc dynamic public var title: String
+    @objc dynamic public var desc: String?
+    @objc dynamic public var url: String
+    @objc dynamic public var urlToImage: String?
+    @objc dynamic public var publishedAt: String
+    @objc dynamic public var content: String?
     
-    public init(source: Source,
-                author: String?,
+    public init(author: String?,
                 title: String,
                 description: String?,
                 url: String,
                 urlToImage: String?,
                 publishedAt: String,
                 content: String?) {
-        self.source = source
         self.author = author
         self.title = title
-        self.description = description
+        self.desc = description
         self.url = url
         self.urlToImage = urlToImage
         self.publishedAt = publishedAt
         self.content = content
+    }
+    
+    func toRealmObject() -> ArticlesRealm {
+        let articles = ArticlesRealm()
+        articles.author = author
+        articles.title = title
+        articles.desc = desc
+        articles.url = url
+        articles.urlToImage = urlToImage
+        articles.publishedAt = publishedAt
+        articles.content = content
+        return articles
     }
 }
 

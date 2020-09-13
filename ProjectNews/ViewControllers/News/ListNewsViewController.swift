@@ -10,12 +10,13 @@ import UIKit
 import Domain
 import RxSwift
 import RxCocoa
+import RxRealmDataSources
 
 class ListNewsViewController: BaseViewController {
     @IBOutlet weak var tableView: UITableView!
     var viewModel: ListNewsViewModel!
-    var showDetailAction = PublishRelay<Articles>()
-    
+    var showDetailAction = PublishRelay<ArticlesRealm>()
+
     public static func instantiate(viewModel: ListNewsViewModel) -> ListNewsViewController {
         let vc = UIViewController().instantiateViewController(fromStoryboard: .home, ofType: ListNewsViewController.self)
         vc.viewModel = viewModel
@@ -37,14 +38,23 @@ class ListNewsViewController: BaseViewController {
     }
     
     private func addObservers() {
+        
+        let dataSource = RxTableViewRealmDataSource<ArticlesRealm>(cellIdentifier:
+        String(describing: NewsCell.self), cellType: NewsCell.self) { cell, _, articles in
+            cell.configCell(articles)
+        }
+        
         viewModel.listNews
-            .asObservable()
-            .bind(to: tableView.rx.items(cellIdentifier: String(describing: NewsCell.self), cellType: NewsCell.self)) { _, articles, cell in
-                cell.configCell(articles)
-        }.disposed(by: disposeBag)
-        tableView.rx.modelSelected(Articles.self).bind(to: showDetailAction).disposed(by: disposeBag)
+            .bind(to: tableView.rx.realmChanges(dataSource))
+            .disposed(by: disposeBag)
+        
+        tableView.rx.realmModelSelected(ArticlesRealm.self)
+        .bind(to: showDetailAction)
+        .disposed(by: disposeBag)
+                
         viewModel.errorsTracker.bind(to: errorBinder).disposed(by: disposeBag)
         viewModel.loadingActivity.bind(to: loadingHUDBinder).disposed(by: disposeBag)
+
     }
     
     private var errorBinder: Binder<DomainError> {

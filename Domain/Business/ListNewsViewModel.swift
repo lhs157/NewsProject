@@ -8,17 +8,23 @@
 
 import RxSwift
 import RxCocoa
+import RealmSwift
+import RxRealm
 
 public class ListNewsViewModel {
     public var service: NewsServiceType
     private var disposeBag = DisposeBag()
     
-    public var listNews = BehaviorSubject<[Articles]>(value: [])
+    public var listNews:  Observable<(AnyRealmCollection<ArticlesRealm>, RealmChangeset?)>!
     public var errorsTracker = PublishSubject<DomainError>()
     public var loadingActivity = PublishSubject<Bool>()
     
     public init(service: NewsServiceType) {
         self.service = service
+        guard let realm = try? Realm() else {
+          return
+        }
+        listNews = Observable.changeset(from: realm.objects(ArticlesRealm.self))
     }
     
     public func fetchListNews() {
@@ -29,12 +35,13 @@ public class ListNewsViewModel {
             .trackActivity("loading", with: activityTracker)
             .trackError(errorTracker)
             .asObservable()
-            .bind(to: loadBinder)
+            .map { $0.map { $0.toRealmObject() } }
+            .bind(to: Realm.rx.add(configuration: Realm.Configuration(), update: .modified, onError: nil))
             .disposed(by: disposeBag)
         
         errorTracker
             .asDomain()
-            .bind(to: errorBinder)
+            .bind(to: errorsTracker)
             .disposed(by: disposeBag)
         
         activityTracker
@@ -42,18 +49,6 @@ public class ListNewsViewModel {
             .bind(to: loadingActivity)
             .disposed(by: disposeBag)
         
-    }
-    
-    private var loadBinder: Binder<[Articles]> {
-        return Binder(self) { (target, listNews) in
-            target.listNews.onNext(listNews)
-        }
-    }
-    
-    private var errorBinder: Binder<DomainError> {
-        return Binder(self) { (target, error) in
-            target.errorsTracker.onNext(error)
-        }
     }
     
 }

@@ -13,9 +13,9 @@ import RxCocoa
 
 class NewsDetailViewCoordinator: BaseCoordinator {
     var navigationController: BaseNavigationController?
-    var selectedNews: Articles!
+    var selectedNews: ArticlesRealm!
     
-    init(navigationController: BaseNavigationController?, selectedNews: Articles) {
+    init(navigationController: BaseNavigationController?, selectedNews: ArticlesRealm) {
         self.navigationController = navigationController
         self.selectedNews = selectedNews
     }

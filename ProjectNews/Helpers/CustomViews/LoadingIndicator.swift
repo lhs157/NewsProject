@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RxCocoa
 import SVProgressHUD
 
 class LoadingIndicator {
@@ -18,5 +19,17 @@ class LoadingIndicator {
     
     func hide() {
         SVProgressHUD.dismiss()
+    }
+}
+
+extension LoadingIndicator {
+    static var defaultLoadingBinder: Binder<Bool> {
+        return Binder(LoadingIndicator.shared) { (target, isLoading) in
+            if isLoading {
+                LoadingIndicator.shared.show()
+            } else {
+                LoadingIndicator.shared.hide()
+            }
+        }
     }
 }

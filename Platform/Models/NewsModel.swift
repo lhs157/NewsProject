@@ -41,8 +41,7 @@ struct ArticlesModel: Decodable {
 
 extension ArticlesModel: DomainConvertible {
     func asDomain() -> Articles {
-        return Articles(source: source.asDomain(),
-                        author: author,
+        return Articles(author: author,
                         title: title,
                         description: description,
                         url: url,
